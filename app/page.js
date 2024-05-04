@@ -5,6 +5,7 @@ import { ImageModel } from 'react-teachable-machine';
 export default function Home() {
   const [isDay, setIsDay] = useState(true);
   const [isNear, setIsNear] = useState(false);
+  const [timestamp, setTimestamp] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -35,9 +36,17 @@ export default function Home() {
   };
 
   // Callback function to handle prediction
-  const handlePredict = (prediction) => {
-    setIsDay(prediction[0].probability > 0.5);
-    setIsNear(prediction[0].probability > 0.5);
+  const handlePredict = (predictions) => {
+    setIsDay(predictions[0].probability > 0.5);
+    setIsNear(predictions[0].probability > 0.5);
+
+    // Check for "야간" prediction
+    const nightPrediction = predictions.find(p => p.className === "야간");
+    if (nightPrediction && nightPrediction.probability > 0.8) {
+      const currentTimestamp = new Date().toLocaleString();
+      setTimestamp(currentTimestamp);
+      console.log("Timestamp for 야간 with probability > 0.8:", currentTimestamp);
+    }
   };
 
   return (
@@ -74,6 +83,7 @@ export default function Home() {
           model_url="https://teachablemachine.withgoogle.com/models/qNic7uOOY/"
         />
       </div>
+      {timestamp && <p>Last 야간 alert: {timestamp}</p>}
     </div>
   );
 }
