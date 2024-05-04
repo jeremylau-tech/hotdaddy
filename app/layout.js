@@ -11,27 +11,24 @@ export const metadata = {
   title: "HotDaddy",
   description:
     "Your one-stop solution to all your competitive fitness problems",
+  icon: {
+    icon: "/favicon.ico",
+  },
 };
-
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-
       <head>
-      <link rel="icon" href="favicon.ico?v=2" type="image/x-icon"/>
-
+        <link rel="icon" href="/favicon.ico?" type="image/x-icon" />
       </head>
-      
-
-      <body className={inter.className}>
-
+      <body className={`${inter.className} h-screen w-screen overflow-hidden`}>
         <AuthProvider>
-          <header> 
-          <Profile /> 
+          <header>
+            <Profile />
           </header>
-          <Navbar />
           {children}
+          <Navbar />
         </AuthProvider>
       </body>
     </html>
