@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/navigation";
 import Profile from "@/components/profile";
 import AuthProvider from "./auth/AuthProvider";
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +18,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
 
+      <head>
+      <link rel="icon" href="favicon.ico?v=2" type="image/x-icon"/>
+
+      </head>
       
+
       <body className={inter.className}>
 
         <AuthProvider>
