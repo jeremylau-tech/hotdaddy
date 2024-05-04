@@ -45,6 +45,7 @@ export default function AuthProvider({ children }) {
       localStorage.removeItem("user");
       router.push("/login");
     }
+    setCurrentUser(null);
   };
 
   const verifyUser = async () => {
