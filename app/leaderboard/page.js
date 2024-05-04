@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getFirestore, collection, doc, setDoc, getDoc } from "firebase/firestore";
 import { FIREBASE_AUTH } from "../firebase";
 
@@ -9,8 +9,16 @@ const GroupComponent = () => {
   const [action, setAction] = useState("create"); // create or join
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [hasRefreshed, setHasRefreshed] = useState(false);
 
   const firestore = getFirestore();
+
+//   useEffect(() => {
+//     if (!hasRefreshed) {
+//       window.location.reload();
+//       setHasRefreshed(true); // Prevent further reloads
+//     }
+//   }, [hasRefreshed]);
 
   const handleAction = async () => {
     try {
@@ -49,7 +57,6 @@ const GroupComponent = () => {
 
   return (
     <div>
-      <h2>Create or Join Room</h2>
       <div>
         <label>
           <input

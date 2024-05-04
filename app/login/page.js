@@ -8,7 +8,6 @@ import { FIREBASE_AUTH } from '../firebase';
 const AuthComponent = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [error, setError] = useState(null);
 
@@ -19,7 +18,7 @@ const AuthComponent = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const userId = userCredential.user.uid;
-      await setDoc(doc(collection(firestore, 'users'), email), { userId, email, name });
+      await setDoc(doc(collection(firestore, 'users'), email), { userId, email});
       setCurrentUser(email);
       setError(null); // Clear any previous error
     } catch (error) {
@@ -40,12 +39,6 @@ const AuthComponent = () => {
   return (
     <div>
       <h2>Authentication</h2>
-      <input
-        type="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-      />
       <input
         type="email"
         value={email}
