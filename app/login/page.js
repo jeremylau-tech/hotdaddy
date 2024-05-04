@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; 
 
 const AuthComponent = () => {
   const router = useRouter();
@@ -38,7 +39,7 @@ const AuthComponent = () => {
   return (
     <>
       <form onSubmit={handleSubmit} className="form-control px-12 gap-y-2">
-        <h2>Authentication</h2>
+        <h2>Sign in to HotDaddy</h2>
         <input
           className="input input-bordered"
           type="email"
@@ -53,9 +54,10 @@ const AuthComponent = () => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
-        <button className="btn" onClick={handleSignUp}>
-          Sign Up
-        </button>
+       
+          <p>Don't have an account yet? <Link href = "/signup"> Sign-up here.</Link> </p>
+          
+        
         <button className="btn" type="submit">
           Login
         </button>

@@ -23,9 +23,6 @@ export default function Home() {
       preserveAspectRatio: "xMidYMid slice"
     }
   };
-  if (!currentUser) {
-    return null;
-  }
 
   const handleStartWorkout = () => {
     setShowModal(true);
@@ -91,9 +88,13 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <button className="btn btn-primary" onClick={handleStartWorkout}>
+
+     
+        {currentUser ? <button className="btn btn-primary" onClick={handleStartWorkout}>
         Start Workout
-      </button>
+      </button> : <h1 className = "text-5xl font-bold"> HotDaddy</h1>
+}
+      
 
       <div className={`modal ${showModal ? "modal-open" : ""}`}>
         <div className="modal-box">
