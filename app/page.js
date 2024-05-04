@@ -36,16 +36,25 @@ export default function Home() {
   };
 
   // Callback function to handle prediction
-  const handlePredict = (predictions) => {
+  const handlePredict = async (predictions) => {
     setIsDay(predictions[0].probability > 0.5);
     setIsNear(predictions[0].probability > 0.5);
 
-    // Check for "야간" prediction
     const nightPrediction = predictions.find(p => p.className === "야간");
     if (nightPrediction && nightPrediction.probability > 0.8) {
-      const currentTimestamp = new Date().toLocaleString();
+      const currentTimestamp = new Date().toISOString();
       setTimestamp(currentTimestamp);
       console.log("Timestamp for 야간 with probability > 0.8:", currentTimestamp);
+
+      // Push the timestamp to Firestore
+      try {
+        await addDoc(collection(firestore, "exercise"), {
+          timestamp: currentTimestamp
+        });
+        console.log("Timestamp successfully added to Firestore");
+      } catch (error) {
+        console.error("Error adding timestamp to Firestore:", error);
+      }
     }
   };
 
