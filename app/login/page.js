@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 
 const AuthComponent = () => {
+  const { currentUser, login, signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
-  const { currentUser, login, signup } = useAuth();
 
   const handleSignUp = async () => {
     try {

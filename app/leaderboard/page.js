@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { FIREBASE_AUTH } from "../firebase";
 import {
   getFirestore,
   collection,
@@ -8,7 +9,6 @@ import {
   setDoc,
   getDoc,
 } from "firebase/firestore";
-import { FIREBASE_AUTH } from "../firebase";
 import { useAuth } from "@/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 
@@ -110,3 +110,5 @@ const GroupComponent = () => {
     </div>
   );
 };
+
+export default GroupComponent;
