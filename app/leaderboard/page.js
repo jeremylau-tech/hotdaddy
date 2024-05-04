@@ -10,30 +10,19 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { useAuth } from "@/auth/AuthProvider";
-import { useRouter } from "next/navigation";
 
 const GroupComponent = () => {
-  const router = useRouter();
   const { currentUser } = useAuth();
-
-  if (!currentUser) {
-    router.push("/login");
-  }
 
   const [roomId, setRoomId] = useState("");
   const [action, setAction] = useState("create"); // create or join
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [hasRefreshed, setHasRefreshed] = useState(false);
 
   const firestore = getFirestore();
-
-  //   useEffect(() => {
-  //     if (!hasRefreshed) {
-  //       window.location.reload();
-  //       setHasRefreshed(true); // Prevent further reloads
-  //     }
-  //   }, [hasRefreshed]);
+  if (!currentUser) {
+    return null;
+  }
 
   const handleAction = async () => {
     try {

@@ -1,51 +1,88 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { collection, doc, setDoc } from "firebase/firestore";
-import { APP, FIREBASE_AUTH, DB } from "@/firebase";
+import { usePathname, useRouter } from "next/navigation";
 
 const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const path = usePathname();
+  const router = useRouter();
 
   const signup = async (email, password, name) => {
-    const userCredential = await createUserWithEmailAndPassword(
-      FIREBASE_AUTH,
-      email,
-      password
-    );
-    await setDoc(doc(collection(DB, "users"), email), {
-      userId: userCredential.user.uid,
-      email,
-      name,
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password,
+        name,
+      }),
     });
-    localStorage.setItem("user", JSON.stringify(userCredential.user));
-    setCurrentUser(userCredential.user);
+
+    const data = await res.json();
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setCurrentUser(data.user);
   };
 
   const login = async (email, password) => {
-    const userCredential = await signInWithEmailAndPassword(
-      FIREBASE_AUTH,
-      email,
-      password
-    );
-    localStorage.setItem("user", JSON.stringify(userCredential.user));
-    setCurrentUser(userCredential.user);
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setCurrentUser(data.user);
+  };
+
+  const signout = async () => {
+    const res = await fetch("/api/auth/signout");
+    if (res.status === 200) {
+      localStorage.removeItem("user");
+      router.push("/login");
+    }
+  };
+
+  const verifyUser = async () => {
+    const res = await fetch("/api/auth/verify", {
+      method: "POST",
+      body: JSON.stringify({
+        user: currentUser,
+      }),
+    });
+    return res.status;
   };
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    setCurrentUser(JSON.parse(user));
-  }, []);
+    if (!user) {
+      return router.push("/login");
+    }
+
+    const getAuthenticatedUser = async () => {
+      const status = await verifyUser();
+      switch (status) {
+        case 200:
+          setCurrentUser(JSON.parse(user));
+          break;
+        case 401:
+          localStorage.removeItem("user");
+          router.push("/login");
+          break;
+        default:
+          router.push("/404");
+          break;
+      }
+    };
+    getAuthenticatedUser();
+  }, [path]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, signup }}>
+    <AuthContext.Provider value={{ currentUser, login, signup, signout }}>
       {children}
     </AuthContext.Provider>
   );
