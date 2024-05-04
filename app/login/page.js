@@ -39,27 +39,53 @@ const AuthComponent = () => {
   return (
     <>
       <form onSubmit={handleSubmit} className="form-control px-12 gap-y-2">
+        
+        
         <h2>Sign in to HotDaddy</h2>
-        <input
-          className="input input-bordered"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <input
-          className="input input-bordered"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
-       
+        <div style={{ marginBottom: "15px" }}>
+          <input
+            className="input input-bordered"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "3px",
+              border: "1px solid #ccc",
+            }}
+          />
+        </div>
+        <div style={{ marginBottom: "15px" }}>
+          <input
+            className="input input-bordered"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "3px",
+              border: "1px solid #ccc",
+            }}
+          />
+        </div>
           <p>Don't have an account yet? <Link href = "/signup"> Sign-up here.</Link> </p>
           
+          <button
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderRadius: "3px",
+            background: "#28a745",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+          }}
         
-        <button className="btn" type="submit">
-          Login
+          >Login
         </button>
       </form>
       {currentUser && <p>Logged in as: {currentUser.email}</p>}
