@@ -2,11 +2,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ImageModel } from 'react-teachable-machine';
 import { DB } from "./firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, query, getDocs } from "firebase/firestore";
+import { useAuth } from "@/auth/AuthProvider";
+import { useRouter } from "next/navigation";
+
 
 export default function Home() {
+  const router = useRouter();
   const [isDay, setIsDay] = useState(true);
-  const [isNear, setIsNear] = useState(false);
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    router.push("/login");
+  }
   const [timestamp, setTimestamp] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -37,28 +45,58 @@ export default function Home() {
     return null;
   };
 
+  
+
+  useEffect(() => {
+    fetchUserExercises();
+  }, []);
+
   // Callback function to handle prediction
   const handlePredict = async (predictions) => {
     setIsDay(predictions[0].probability > 0.5);
-    setIsNear(predictions[0].probability > 0.5);
 
-    const nightPrediction = predictions.find(p => p.className === "Push-up: Down");
+    const nightPrediction = predictions.find(p => p.className === "야간");
+
     if (nightPrediction && nightPrediction.probability > 0.5) {
-      const currentTimestamp = new Date().toISOString();
-      setTimestamp(currentTimestamp);
-      console.log("Timestamp for 야간 with probability > 0.8:", currentTimestamp);
+        // Get the current timestamp
+        const currentDate = new Date();
 
-      // Push the timestamp to Firestore
-      try {
-        await addDoc(collection(DB, "exercise123"), {
-          timestamp: currentTimestamp
-        });
-        console.log("Timestamp successfully added to Firestore");
-      } catch (error) {
-        console.error("Error adding timestamp to Firestore:", error);
-      }
+        // Convert to EST
+        const options = {
+            timeZone: "America/Toronto",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        };
+        const localTimeString = currentDate.toLocaleString("en-CA", options);
+        const [datePart, timePart] = localTimeString.split(", ");
+        const [year, month, day] = datePart.split("-");
+        const [hour, minute, second] = timePart.split(":");
+        
+        const estDate = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+        const formattedTimestamp = estDate.toISOString().replace("Z", "-05:00");
+
+        setTimestamp(formattedTimestamp);
+        console.log("Timestamp for 야간 with probability > 0.8:", formattedTimestamp);
+
+        // Push the timestamp to Firestore
+        try {
+            await addDoc(collection(DB, "exercise"), {
+                timestamp: formattedTimestamp,
+                userId: currentUser?.uid,
+            });
+            console.log("Timestamp successfully added to Firestore");
+        } catch (error) {
+            console.error("Error adding timestamp to Firestore:", error);
+        }
     }
-  };
+};
+
+
 
   return (
     <div>
@@ -84,17 +122,19 @@ export default function Home() {
       <div style={{
         backgroundColor: isDay ? 'white' : 'black',
         color: isDay ? 'black' : 'white',
-        fontSize: isNear ? '1rem' : '4rem'
+        // fontSize: isNear ? '1rem' : '4rem'
       }}>
         <ImageModel
           preview={false}
           size={200}
           interval={500}
           onPredict={handlePredict}
-          model_url="https://teachablemachine.withgoogle.com/models/Hg31uICu-/"
+          model_url="https://teachablemachine.withgoogle.com/models/qNic7uOOY/"
         />
       </div>
       {timestamp && <p>Last 야간 alert: {timestamp}</p>}
+
+    
     </div>
   );
 }
