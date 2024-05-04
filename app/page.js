@@ -1,6 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from "react";
 import { ImageModel } from 'react-teachable-machine';
+import { DB } from "./firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 export default function Home() {
   const [isDay, setIsDay] = useState(true);
@@ -40,15 +42,15 @@ export default function Home() {
     setIsDay(predictions[0].probability > 0.5);
     setIsNear(predictions[0].probability > 0.5);
 
-    const nightPrediction = predictions.find(p => p.className === "야간");
-    if (nightPrediction && nightPrediction.probability > 0.8) {
+    const nightPrediction = predictions.find(p => p.className === "Push-up: Down");
+    if (nightPrediction && nightPrediction.probability > 0.5) {
       const currentTimestamp = new Date().toISOString();
       setTimestamp(currentTimestamp);
       console.log("Timestamp for 야간 with probability > 0.8:", currentTimestamp);
 
       // Push the timestamp to Firestore
       try {
-        await addDoc(collection(firestore, "exercise"), {
+        await addDoc(collection(DB, "exercise123"), {
           timestamp: currentTimestamp
         });
         console.log("Timestamp successfully added to Firestore");
@@ -89,7 +91,7 @@ export default function Home() {
           size={200}
           interval={500}
           onPredict={handlePredict}
-          model_url="https://teachablemachine.withgoogle.com/models/qNic7uOOY/"
+          model_url="https://teachablemachine.withgoogle.com/models/Hg31uICu-/"
         />
       </div>
       {timestamp && <p>Last 야간 alert: {timestamp}</p>}
