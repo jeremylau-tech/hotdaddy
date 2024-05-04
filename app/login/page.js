@@ -1,25 +1,17 @@
-"use client"
-
-import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
-import { FIREBASE_AUTH } from '../firebase';
+"use client";
+import React, { useState } from "react";
+import { useAuth } from "@/auth/AuthProvider";
 
 const AuthComponent = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [currentUser, setCurrentUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState(null);
-
-  const auth = getAuth();
-  const firestore = getFirestore();
+  const { currentUser, login, signup } = useAuth();
 
   const handleSignUp = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const userId = userCredential.user.uid;
-      await setDoc(doc(collection(firestore, 'users'), email), { userId, email});
-      setCurrentUser(email);
+      await signup(email, password, name);
       setError(null); // Clear any previous error
     } catch (error) {
       setError(error.message);
@@ -28,8 +20,7 @@ const AuthComponent = () => {
 
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      setCurrentUser(userCredential.user.email);
+      await login(email, password);
       setError(null); // Clear any previous error
     } catch (error) {
       setError(error.message);
@@ -53,8 +44,8 @@ const AuthComponent = () => {
       />
       <button onClick={handleSignUp}>Sign Up</button>
       <button onClick={handleLogin}>Login</button>
-      {currentUser && <p>Logged in as: {currentUser}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {currentUser && <p>Logged in as: {currentUser.email}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };

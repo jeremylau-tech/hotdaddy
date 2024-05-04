@@ -1,10 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getFirestore, collection, doc, setDoc, getDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
 import { FIREBASE_AUTH } from "../firebase";
+import { useAuth } from "@/auth/AuthProvider";
+import { useRouter } from "next/navigation";
 
 const GroupComponent = () => {
+  const router = useRouter();
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    router.push("/login");
+  }
+
   const [roomId, setRoomId] = useState("");
   const [action, setAction] = useState("create"); // create or join
   const [error, setError] = useState(null);
@@ -13,12 +28,12 @@ const GroupComponent = () => {
 
   const firestore = getFirestore();
 
-//   useEffect(() => {
-//     if (!hasRefreshed) {
-//       window.location.reload();
-//       setHasRefreshed(true); // Prevent further reloads
-//     }
-//   }, [hasRefreshed]);
+  //   useEffect(() => {
+  //     if (!hasRefreshed) {
+  //       window.location.reload();
+  //       setHasRefreshed(true); // Prevent further reloads
+  //     }
+  //   }, [hasRefreshed]);
 
   const handleAction = async () => {
     try {
@@ -32,7 +47,9 @@ const GroupComponent = () => {
 
       if (action === "create") {
         if (roomDoc.exists()) {
-          setError("Room ID already exists. Please choose a different ID or join the room.");
+          setError(
+            "Room ID already exists. Please choose a different ID or join the room."
+          );
           setSuccess(null);
         } else {
           const userIDs = ["user1", "user2"]; // Example user IDs, this could be dynamic based on your needs
@@ -42,7 +59,9 @@ const GroupComponent = () => {
         }
       } else if (action === "join") {
         if (!roomDoc.exists()) {
-          setError("Room ID does not exist. Please create a new room or join an existing one.");
+          setError(
+            "Room ID does not exist. Please create a new room or join an existing one."
+          );
           setSuccess(null);
         } else {
           setSuccess("Joined room successfully!");
@@ -83,11 +102,11 @@ const GroupComponent = () => {
         onChange={(e) => setRoomId(e.target.value)}
         placeholder="Room ID"
       />
-      <button onClick={handleAction}>{action === "create" ? "Create Room" : "Join Room"}</button>
+      <button onClick={handleAction}>
+        {action === "create" ? "Create Room" : "Join Room"}
+      </button>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}
     </div>
   );
 };
-
-export default GroupComponent;
