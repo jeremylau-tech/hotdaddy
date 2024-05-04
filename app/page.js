@@ -1,55 +1,48 @@
-'use client'
-import React, { useState, useRef, useEffect } from "react";
-import { ImageModel } from 'react-teachable-machine';
-import { DB } from "./firebase";
-import { addDoc, collection, query, getDocs } from "firebase/firestore";
+"use client";
 import { useAuth } from "@/auth/AuthProvider";
+import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Lottie from "react-lottie"
+import ani1 from "./sap.json"
+import ani2 from "./sap2.json"
+import ani3 from "./sap3.json"
+import ani4 from "./sap4.json"
 
 
 export default function Home() {
-  const router = useRouter();
-  const [isDay, setIsDay] = useState(true);
   const { currentUser } = useAuth();
-
-  if (!currentUser) {
-    router.push("/login");
-  }
-  const [timestamp, setTimestamp] = useState(null);
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    // Access the user's webcam stream
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      })
-      .catch(error => {
-        console.error('Error accessing webcam:', error);
-      });
-  }, []);
-
-  // Function to capture the current frame of the video
-  const captureFrame = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (video && canvas) {
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/jpeg');
-      return imageData;
+  const [showModal, setShowModal] = useState(false);
+  const [reps, setReps] = useState(0);
+  const router = useRouter();
+  const defaultOptions = {
+    loop: false,
+    autoplay: true,
+    animationData: ani3,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
     }
+  };
+  if (!currentUser) {
     return null;
+  }
+
+  const handleStartWorkout = () => {
+    setShowModal(true);
   };
 
-  
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
 
-  useEffect(() => {
-    fetchUserExercises();
-  }, []);
+  const handleConfirm = () => {
+    setShowModal(false);
+    console.log("Default reps set to:", reps);
+    router.push({
+      pathname: '/workout',
+      query: { reps: reps },
+    });
+  };
 
   // Callback function to handle prediction
   const handlePredict = async (predictions) => {
@@ -96,45 +89,37 @@ export default function Home() {
     }
 };
 
-
-
   return (
-    <div>
-      <div>
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          style={{ width: '100%', maxWidth: '600px' }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{ display: 'none' }}
-          width="640"
-          height="480"
-        />
-        <button onClick={() => {
-          const imageData = captureFrame();
-          // Handle the captured image data (e.g., send it to the model)
-          console.log('Captured image data:', imageData);
-        }}>Capture Image</button>
-      </div>
-      <div style={{
-        backgroundColor: isDay ? 'white' : 'black',
-        color: isDay ? 'black' : 'white',
-        // fontSize: isNear ? '1rem' : '4rem'
-      }}>
-        <ImageModel
-          preview={false}
-          size={200}
-          interval={500}
-          onPredict={handlePredict}
-          model_url="https://teachablemachine.withgoogle.com/models/qNic7uOOY/"
-        />
-      </div>
-      {timestamp && <p>Last 야간 alert: {timestamp}</p>}
+    <div className="flex flex-col items-center justify-center h-screen">
+      <button className="btn btn-primary" onClick={handleStartWorkout}>
+        Start Workout
+      </button>
 
-    
+      <div className={`modal ${showModal ? "modal-open" : ""}`}>
+        <div className="modal-box">
+          <button
+            className="btn btn-sm btn-circle absolute right-2 top-2"
+            onClick={handleModalClose}
+          >
+            &times;
+          </button>
+          <p className="text-lg font-semibold mb-4">
+            Enter your default number of reps:
+          </p>
+          <input
+            type="number"
+            value={reps}
+            onChange={(e) => setReps(e.target.value)}
+            className="input input-bordered w-full mb-4"
+          />
+          <button className="btn btn-primary w-full" onClick={handleConfirm}>
+            Confirm
+          </button>
+        </div>
+      </div>
+      <div>
+        <Lottie options = {defaultOptions} height={200} width={200} />
+      </div>
     </div>
   );
 }
