@@ -1,4 +1,4 @@
-import { FIREBASE_AUTH } from "@/firebase";
+  import { FIREBASE_AUTH } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { NextResponse } from "next/server";
 
