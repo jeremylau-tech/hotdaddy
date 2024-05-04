@@ -24,9 +24,9 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.className} h-screen w-screen overflow-hidden`}>
         <AuthProvider>
-          <header>
+          {/* <header>
             <Profile />
-          </header>
+          </header> */}
           {children}
           <Navbar />
         </AuthProvider>

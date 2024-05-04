@@ -3,12 +3,12 @@ import { useAuth } from "@/auth/AuthProvider";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Lottie from "react-lottie"
-import ani1 from "./sap.json"
-import ani2 from "./sap2.json"
-import ani3 from "./sap3.json"
-import ani4 from "./sap4.json"
-
+import Lottie from "react-lottie";
+import ani1 from "./sap.json";
+import ani2 from "./sap2.json";
+import ani3 from "./sap3.json";
+import ani4 from "./sap4.json";
+import { poetsen } from "./fonts";
 
 export default function Home() {
   const { currentUser } = useAuth();
@@ -20,8 +20,8 @@ export default function Home() {
     autoplay: true,
     animationData: ani3,
     rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice"
-    }
+      preserveAspectRatio: "xMidYMid slice",
+    },
   };
 
   const handleStartWorkout = () => {
@@ -36,7 +36,7 @@ export default function Home() {
     setShowModal(false);
     console.log("Default reps set to:", reps);
     router.push({
-      pathname: '/workout',
+      pathname: "/workout",
       query: { reps: reps },
     });
   };
@@ -45,56 +45,72 @@ export default function Home() {
   const handlePredict = async (predictions) => {
     setIsDay(predictions[0].probability > 0.5);
 
-    const nightPrediction = predictions.find(p => p.className === "야간");
+    const nightPrediction = predictions.find((p) => p.className === "야간");
 
     if (nightPrediction && nightPrediction.probability > 0.5) {
-        // Get the current timestamp
-        const currentDate = new Date();
+      // Get the current timestamp
+      const currentDate = new Date();
 
-        // Convert to EST
-        const options = {
-            timeZone: "America/Toronto",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        };
-        const localTimeString = currentDate.toLocaleString("en-CA", options);
-        const [datePart, timePart] = localTimeString.split(", ");
-        const [year, month, day] = datePart.split("-");
-        const [hour, minute, second] = timePart.split(":");
-        
-        const estDate = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-        const formattedTimestamp = estDate.toISOString().replace("Z", "-05:00");
+      // Convert to EST
+      const options = {
+        timeZone: "America/Toronto",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      };
+      const localTimeString = currentDate.toLocaleString("en-CA", options);
+      const [datePart, timePart] = localTimeString.split(", ");
+      const [year, month, day] = datePart.split("-");
+      const [hour, minute, second] = timePart.split(":");
 
-        setTimestamp(formattedTimestamp);
-        console.log("Timestamp for 야간 with probability > 0.8:", formattedTimestamp);
+      const estDate = new Date(
+        Date.UTC(year, month - 1, day, hour, minute, second)
+      );
+      const formattedTimestamp = estDate.toISOString().replace("Z", "-05:00");
 
-        // Push the timestamp to Firestore
-        try {
-            await addDoc(collection(DB, "exercise"), {
-                timestamp: formattedTimestamp,
-                userId: currentUser?.uid,
-            });
-            console.log("Timestamp successfully added to Firestore");
-        } catch (error) {
-            console.error("Error adding timestamp to Firestore:", error);
-        }
+      setTimestamp(formattedTimestamp);
+      console.log(
+        "Timestamp for 야간 with probability > 0.8:",
+        formattedTimestamp
+      );
+
+      // Push the timestamp to Firestore
+      try {
+        await addDoc(collection(DB, "exercise"), {
+          timestamp: formattedTimestamp,
+          userId: currentUser?.uid,
+        });
+        console.log("Timestamp successfully added to Firestore");
+      } catch (error) {
+        console.error("Error adding timestamp to Firestore:", error);
+      }
     }
-};
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-
-     
-        {currentUser ? <button className="btn btn-primary" onClick={handleStartWorkout}>
-        Start Workout
-      </button> : <h1 className = "text-5xl font-bold"> HotDaddy</h1>
-}
-      
+      <button
+        className={`${poetsen.className} text-xl text-primary absolute top-0 left-0 ml-4 mt-4`}
+      >
+        HotDaddy
+      </button>
+      {currentUser ? (
+        <button
+          className="btn font-bold text-xl btn-primary"
+          onClick={handleStartWorkout}
+        >
+          Start Workout
+        </button>
+      ) : (
+        <h1 className={`text-5xl font-bold text-primary ${poetsen.className}`}>
+          {" "}
+          HotDaddy
+        </h1>
+      )}
 
       <div className={`modal ${showModal ? "modal-open" : ""}`}>
         <div className="modal-box">
@@ -119,8 +135,16 @@ export default function Home() {
         </div>
       </div>
       <div>
-        <Lottie options = {defaultOptions} height={200} width={200} />
+        <Lottie options={defaultOptions} height={200} width={200} />
       </div>
+      {!currentUser && (
+        <Link
+          href="/login"
+          className="btn btn-lg btn-primary rounded-2xl mt-10"
+        >
+          Get Started
+        </Link>
+      )}
     </div>
   );
 }

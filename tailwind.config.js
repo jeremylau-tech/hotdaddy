@@ -7,7 +7,15 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        content: "calc(100% - 4rem)",
+        fullScreen: "calc(100vh - 4 rem)",
+      },
+      maxHeight: {
+        content: "calc(100% - 4rem)",
+      },
+    },
   },
   plugins: [daisyui],
 };

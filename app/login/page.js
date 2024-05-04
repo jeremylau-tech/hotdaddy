@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; 
+import Link from "next/link";
+import { poetsen } from "@/fonts";
 
 const AuthComponent = () => {
   const router = useRouter();
@@ -11,15 +12,6 @@ const AuthComponent = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
-
-  const handleSignUp = async () => {
-    try {
-      await signup(email, password, name);
-      setError(null); // Clear any previous error
-    } catch (error) {
-      setError(error.message);
-    }
-  };
 
   const handleLogin = async () => {
     try {
@@ -37,60 +29,41 @@ const AuthComponent = () => {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="form-control px-12 gap-y-2">
-        
-        
-        <h2>Sign in to HotDaddy</h2>
-        <div style={{ marginBottom: "15px" }}>
+    <main className="w-screen h-screen flex justify-center items-center">
+      <form onSubmit={handleSubmit} className="form-control gap-y-2 mb-24">
+        <h1 className="text-primary text-center text-4xl font-extralight">
+          Sign in to <span className={`${poetsen.className}`}>HotDaddy</span>
+        </h1>
+        <p className="text-sm text-center">
+          Don't have an account yet?{" "}
+          <Link className="link" href="/signup">
+            {" "}
+            Sign-up here
+          </Link>{" "}
+        </p>
+        <div style={{ marginBottom: "15px", marginTop: "8px" }}>
           <input
-            className="input input-bordered"
+            className="input input-bordered w-full"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "3px",
-              border: "1px solid #ccc",
-            }}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
           <input
-            className="input input-bordered"
+            className="input input-bordered w-full"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "3px",
-              border: "1px solid #ccc",
-            }}
           />
         </div>
-          <p>Don't have an account yet? <Link href = "/signup"> Sign-up here.</Link> </p>
-          
-          <button
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "3px",
-            background: "#28a745",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-          }}
-        
-          >Login
-        </button>
+
+        <button className="btn btn-primary">Login</button>
       </form>
-      {currentUser && <p>Logged in as: {currentUser.email}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-    </>
+    </main>
   );
 };
 

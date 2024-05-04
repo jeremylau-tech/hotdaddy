@@ -3,14 +3,11 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
-import { faPowerOff } from '@fortawesome/free-solid-svg-icons/faPowerOff';
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons/faPowerOff";
 import { faRankingStar } from "@fortawesome/free-solid-svg-icons/faRankingStar";
 import { faSeedling } from "@fortawesome/free-solid-svg-icons/faSeedling";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/auth/AuthProvider";
-
-
-
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -56,7 +53,10 @@ export default function Navbar() {
           </Link>
         </li>
         <li>
-          <button onClick={() => signout()}><FontAwesomeIcon icon={faPowerOff} />Logout</button>
+          <button onClick={() => signout()}>
+            <FontAwesomeIcon icon={faPowerOff} />
+            Logout
+          </button>
         </li>
       </ul>
     </nav>

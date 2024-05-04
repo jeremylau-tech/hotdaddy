@@ -1,73 +1,69 @@
-"use client"
+"use client";
 
-import React, { createContext, useContext, useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
-import { FIREBASE_AUTH } from '../firebase';
+import React, { useState } from "react";
+import { useAuth } from "@/auth/AuthProvider";
+import { poetsen } from "@/fonts";
 
-const AuthContext = createContext();
-
-const AuthComponent =  ({ children }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [currentUser, setCurrentUser] = useState(null);
+const AuthComponent = ({ children }) => {
+  const { currentUser, signup } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState(null);
-
-  const auth = getAuth();
-  const firestore = getFirestore();
 
   const handleSignUp = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const userId = userCredential.user.uid;
-      await setDoc(doc(collection(firestore, 'users'), email), { userId, email, name });
-      setCurrentUser(email);
+      await signup(email, password, name);
       setError(null); // Clear any previous error
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      setCurrentUser(userCredential.user.email);
-      setError(null); // Clear any previous error
-    } catch (error) {
-      setError(error.message);
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleSignUp();
   };
 
   return (
-    <div>
-      <AuthContext.Provider value={{ currentUser, setCurrentUser }}>
-      {children}
-      <h2>Authentication</h2>
-      <input
-        type="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-      />
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <button onClick={handleSignUp}>Sign Up</button>
-      <button onClick={handleLogin}>Login</button>
-      {currentUser && <p>Logged in as: {currentUser}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      </AuthContext.Provider>
-    </div>
+    <main className="w-screen h-screen flex justify-center items-center px-6">
+      <form onSubmit={handleSubmit} className="form-control gap-y-2 mb-24">
+        <h1 className="text-primary text-center text-4xl font-extralight">
+          Your <span className={`${poetsen.className}`}>HotDaddy</span>{" "}
+          Information
+        </h1>
+        <div style={{ marginBottom: "15px", marginTop: "8px" }}>
+          <input
+            className="input input-bordered w-full"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+          />
+        </div>
+        <div style={{ marginBottom: "15px", marginTop: "8px" }}>
+          <input
+            className="input input-bordered w-full"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+        </div>
+        <div style={{ marginBottom: "15px" }}>
+          <input
+            className="input input-bordered w-full"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+        </div>
+
+        <button className="btn btn-primary">Sign Up</button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </main>
   );
 };
 
