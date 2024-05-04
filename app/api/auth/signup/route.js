@@ -4,15 +4,18 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic"; // defaults to auto
-export async function GET(request) {
-  const { email, password, name } = request.body;
-
+export async function POST(request) {
+  const data = await request.json();
+  const { email, password, name } = data;
+console.log(email, password, name);
   const userCredential = await createUserWithEmailAndPassword(
     FIREBASE_AUTH,
     email,
     password
   );
-  await setDoc(doc(collection(DB, "users"), email), {
+  
+  const userId = userCredential.user.uid;
+  await setDoc(doc(collection(DB, "users"), userId), {
     userId: userCredential.user.uid,
     email,
     name,

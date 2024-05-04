@@ -11,6 +11,7 @@ export default function AuthProvider({ children }) {
   const router = useRouter();
 
   const signup = async (email, password, name) => {
+    console.log(email, password, name);
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       body: JSON.stringify({
