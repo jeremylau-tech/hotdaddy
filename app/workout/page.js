@@ -4,7 +4,7 @@ import { ImageModel } from "react-teachable-machine";
 import { DB } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { useAuth } from "@/auth/AuthProvider";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Workout() {
   const { currentUser } = useAuth();
@@ -14,8 +14,11 @@ export default function Workout() {
   const [timestamp, setTimestamp] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const searchParams = useSearchParams(); // Use Next.js' hook to read search parameters
+  const reps = searchParams.get("reps");
 
   useEffect(() => {
+    console.log("Default reps:", reps);
     // Access the user's webcam stream
     if (!isVideoOpen) {
       return;
@@ -55,34 +58,37 @@ export default function Workout() {
     setIsNear(predictions[0].probability > 0.5);
 
     const nightPrediction = predictions.find(
-      (p) => p.className === "Push-up: Down"
+        (p) => p.className === "Push-up: Down"
     );
     if (nightPrediction && nightPrediction.probability > 0.5) {
-      const currentTimestamp = new Date().toISOString();
-      setTimestamp(currentTimestamp);
-      console.log(
-        "Timestamp for 야간 with probability > 0.8:",
-        currentTimestamp
-      );
+        const currentTimestamp = new Date().toISOString();
+        setTimestamp(currentTimestamp);
+        console.log(
+            "Timestamp for 야간 with probability > 0.8:",
+            currentTimestamp
+        );
 
-      // Push the timestamp to Firestore
-      try {
-        await addDoc(collection(DB, "exercise123"), {
-          timestamp: currentTimestamp,
-        });
-        console.log("Timestamp successfully added to Firestore");
-      } catch (error) {
-        console.error("Error adding timestamp to Firestore:", error);
-      }
+        // Push the timestamp to Firestore
+        try {
+            await addDoc(collection(DB, "exercise123"), {
+                timestamp: currentTimestamp,
+            });
+            console.log("Timestamp successfully added to Firestore");
+        } catch (error) {
+            console.error("Error adding timestamp to Firestore:", error);
+        }
     }
-  };
+};
 
   return (
     <div>
       <div>
         <button
           className="px-2 py-1 bg-slate-600 text-white"
-          onClick={() => setIsVideoOpen(!isVideoOpen)}
+          onClick={() => {
+            console.log("Data from router:", reps);
+            setIsVideoOpen(!isVideoOpen);
+          }}
         >
           Toggle Video
         </button>
