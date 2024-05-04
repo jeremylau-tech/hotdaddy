@@ -12,7 +12,9 @@ import {
   getDocs
 } from "firebase/firestore";
 import { useAuth } from "@/auth/AuthProvider";
+import {firestore} from "@/firebase";
 import { useRouter } from "next/navigation";
+// import { getFirestore } from "firebase/firestore"; // adjust the path as needed
 
 const GroupComponent = () => {
   const router = useRouter();
@@ -22,7 +24,6 @@ const GroupComponent = () => {
   const [action, setAction] = useState("create"); // create or join
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [hasRefreshed, setHasRefreshed] = useState(false);
 
   const firestore = getFirestore();
 
