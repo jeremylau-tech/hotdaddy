@@ -17,7 +17,7 @@ export default function Workout() {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
 
   // const [isDown, setIsDown] = useState(false);
-
+  const [workoutFinished, setWorkoutFinished] = useState(false);
   const { currentUser } = useAuth();
   const videoRef = useRef(null);
   const searchParams = useSearchParams();
@@ -26,6 +26,8 @@ export default function Workout() {
   const DB = getFirestore(); // Initialize Firestore
   const router = useRouter();
   const currentRepsRef = useRef(0);
+  const greenRef = useRef(false);
+  const notGreenRef = useRef(true);
   const repsDisplayRef = useRef(null);
 
   let currentReps = 0;
@@ -61,7 +63,8 @@ export default function Workout() {
   }
 
   const closeModal = () => {
-    router.back();
+    setShowModal(false);
+    router.back(); // Delay the navigation slightly to ensure state updates have been processed.
   };
 
   let isDown = false;
@@ -81,6 +84,10 @@ export default function Workout() {
     } else if (isUpProb > 0.6 && isDown) {
       console.log("Counted Rep")
       currentRepsRef.current += 1;
+      if (currentRepsRef.current >= reps){
+        greenRef.current = true;
+        notGreenRef.current = false;
+      }
       updateRepsDisplay();
       isDown = false;
 
@@ -90,33 +97,26 @@ export default function Workout() {
   };
 
   const finishWorkout = async () => {
-    setShowModal(true);
-    if (currentReps >= reps) {
-      // Navigate to the next page
-      try {
-        // Reference to the user's document in Firestore
-        const userDocRef = doc(collection(DB, "users"), currentUser.uid);
-        const docSnap = await getDoc(userDocRef);
-
-        if (docSnap.exists()) {
-          // Get current number of goals
-          const currentGoals = docSnap.data().numGoals || 0; // Default to 0 if undefined
-          // Increment the number of goals
-          const newGoals = currentGoals + 1;
-          
-
-          // Update the document
-          await updateDoc(userDocRef, { numGoals: newGoals });
-          console.log("Number of goals updated to:", newGoals);
-        } else {
-          console.log("No such document!");
+    if (!workoutFinished) {
+      setWorkoutFinished(true);
+      setShowModal(true);
+      if (currentRepsRef.current.value >= reps) {
+        try {
+          const userDocRef = doc(collection(DB, "users"), currentUser.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const currentGoals = docSnap.data().numGoals || 0;
+            await updateDoc(userDocRef, { numGoals: currentGoals + 1 });
+            console.log("Number of goals updated to:", currentGoals + 1);
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error updating document: ", error);
         }
-      } catch (error) {
-        console.error("Error updating document: ", error);
       }
-
-      // TODO: ADD EXERCISE ENTRY INTO TABLE
     }
+    // TODO: SET EXERCISE
   };
 
   return (
@@ -133,7 +133,7 @@ export default function Workout() {
           <div className="z-30 absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-8 rounded-lg">
               <h2 className="text-xl font-bold">Workout Summary</h2>
-              <p>Total Reps Completed: {currentReps}</p>
+              <p>Total Reps Completed: {currentRepsRef.current}</p>
               <p>Goal Reps: {reps}</p>
               <button
                 className="btn btn-primary mt-4"
@@ -145,17 +145,20 @@ export default function Workout() {
           </div>
         )}
         {/* Reps display at the top */}
-        <div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
+        (<div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
           <div className="bg-white bg-opacity-50 rounded-full px-8 py-2">
             <h3 className="text-lg font-semibold text-black">
             <div ref={repsDisplayRef}>Current Reps: 0 / ${reps}</div>
             </h3>
           </div>
-        </div>
+        </div>)
+
+
+        
 
         {/* Buttons centered at the bottom */}
         <div className="absolute bottom-0 left-0 w-full p-4 flex justify-center space-x-4 z-30">
-          <button className="btn btn-primary" onClick={finishWorkout}>
+          <button className="btn btn-primary" onClick={finishWorkout} disabled={workoutFinished}>
             {" "}
             Finish Workout
           </button>
