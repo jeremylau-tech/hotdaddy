@@ -16,21 +16,28 @@ import { DB } from "@/firebase";
 export default function Workout() {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
 
-  const [isDay, setIsDay] = useState(true);
-  const [isNear, setIsNear] = useState(false);
+  // const [isDown, setIsDown] = useState(false);
 
   const { currentUser } = useAuth();
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
   const searchParams = useSearchParams();
   const reps = searchParams.get("reps");
-  const [currentReps, setCurrentReps] = useState(0);
+  // const [currentReps, setCurrentReps] = useState(0);
   const DB = getFirestore(); // Initialize Firestore
   const router = useRouter();
+  const currentRepsRef = useRef(0);
+  const repsDisplayRef = useRef(null);
 
-  var down = false;
+  let currentReps = 0;
+
+  const updateRepsDisplay = () => {
+    if (repsDisplayRef.current) {
+      repsDisplayRef.current.textContent = `Current Reps: ${currentRepsRef.current} / ${reps}`;
+    }
+  };
 
   useEffect(() => {
+    updateRepsDisplay();
     // Automatically start the video with specified resolution and mirrored
     navigator.mediaDevices
       .getUserMedia({
@@ -61,20 +68,31 @@ export default function Workout() {
     router.back();
   };
 
+  let isDown = false;
+
   // Callback function to handle prediction
   const handlePredict = (prediction) => {
-    console.log(prediction);
-    if (prediction[1].probability > 0.6) {
-      down = true;
-    } else {
-      if (down) {
-        handleIncrementReps();
-        down = false;
-      }
-    }
+    const isDownProb = (prediction[1].probability > 0.6);
+    const isUpProb = (prediction[0].probability > 0.6);
+    const isStopProb = (prediction[2].probability > 0.6);
+    
 
-    // setIsDay(prediction[0].probability > 0.5);
-    // setIsNear(prediction[0].probability > 0.5);
+    if (isDownProb > 0.6 && !isDown) {
+      console.log("DOWN")
+      isDown = true;
+      console.log("Is Down State", isDown);
+
+    } else if (isUpProb > 0.6 && isDown) {
+      console.log("Counted Rep")
+      // setCurrentReps(reps => reps + 1);
+      currentRepsRef.current += 1;
+      updateRepsDisplay();
+      // console.log("Current Reps: ", currentReps);
+      isDown = false;
+
+    } else if (isStopProb > 0.6) {
+      console.log("STOP")
+    }
   };
 
   const finishWorkout = async () => {
@@ -91,6 +109,7 @@ export default function Workout() {
           const currentGoals = docSnap.data().numGoals || 0; // Default to 0 if undefined
           // Increment the number of goals
           const newGoals = currentGoals + 1;
+          
 
           // Update the document
           await updateDoc(userDocRef, { numGoals: newGoals });
@@ -134,7 +153,7 @@ export default function Workout() {
         {/* Reps display at the top */}
         <div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
           <h3 className="text-lg font-semibold text-white">
-            Current Reps: {currentReps} out of {reps}
+          <div ref={repsDisplayRef}>Current Reps: 0 / ${reps}</div>
           </h3>
         </div>
 
@@ -153,7 +172,7 @@ export default function Workout() {
           size={200}
           interval={500}
           onPredict={handlePredict}
-          model_url="https://teachablemachine.withgoogle.com/models/Hg31uICu-/"
+          model_url="https://teachablemachine.withgoogle.com/models/wj8bkdODz/"
         />
       </div>
     </>
