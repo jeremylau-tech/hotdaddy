@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function FAB({ className, children, position, onClick }) {
   // Initialize theme based on localStorage or default to 'light'
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light'); //gets local theme
 
   // Apply the theme to the body or root element
   useEffect(() => {
