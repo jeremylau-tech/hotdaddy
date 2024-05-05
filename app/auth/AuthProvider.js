@@ -61,7 +61,10 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    if (!user && (path !== '/login' && path !== '/signup')) {
+    if (
+      (!user && path !== "/login" && path !== "/signup") ||
+      (user && (path === "/login" || path === "/signup"))
+    ) {
       return router.push("/");
     }
 

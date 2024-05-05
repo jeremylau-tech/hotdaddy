@@ -20,10 +20,11 @@ import {
   setDoc,
   getDoc,
 } from "firebase/firestore";
+import Link from "next/link";
 import { app } from "@/firebase"; // Your Firebase app setup
 
 export default function Home() {
-  const { currentUser } = useAuth();
+  const { currentUser, signout } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [reps, setReps] = useState(0);
   const [exercise, setExercise] = useState("Push Ups");
@@ -60,7 +61,6 @@ export default function Home() {
 
   const defaultOptions = {
     loop: false,
-
     autoplay: true,
     animationData: selectedAnimation,
     rendererSettings: {
@@ -95,21 +95,60 @@ export default function Home() {
   };
 
   return (
-    <main className="h-content">
-      <div className="flex flex-col items-center justify-evenly h-full overflow-hidden">
-        <FAB className={"glass mt-2 mr-2"} position={"topRight"}>
-          <FontAwesomeIcon icon={faArrowRightFromBracket} />
-        </FAB>
-        <h1 className="text-primary text-5xl text-start self-center m-4">
-          Get started working out!
-        </h1>
-        <div className="h-160 w-96 pointer-events-none">
-          <Lottie options={defaultOptions} height="100%" width="100%" />
-        </div>
-        <button className="btn btn-primary" onClick={handleStartWorkout}>
-          Start Workout
-        </button>
-
+    <main className="h-screen">
+      <div className="flex flex-col items-center justify-evenly h-content overflow-hidden">
+        {currentUser ? (
+          <>
+            <h1 className="ml-16 text-primary text-5xl text-start self-center m-4">
+              Get started working out!
+            </h1>
+            <FAB
+              onClick={() =>
+                document.getElementById("signoutModal").showModal()
+              }
+              className={"glass mt-2 mr-2"}
+              position={"topRight"}
+            >
+              <FontAwesomeIcon icon={faArrowRightFromBracket} />
+            </FAB>
+            <div className="h-160 w-96">
+              <Lottie options={defaultOptions} height="100%" width="100%" />
+            </div>
+            <button className="btn btn-primary" onClick={handleStartWorkout}>
+              Start Workout
+            </button>
+          </>
+        ) : (
+          <>
+            <h1
+              className={`text-5xl font-bold text-primary ${poetsen.className}`}
+            >
+              {" "}
+              HotDaddy
+            </h1>
+            <div className="h-[200px] w-[200px]">
+              <Lottie
+                options={{
+                  loop: false,
+                  autoplay: true,
+                  animationData: ani4,
+                  rendererSettings: {
+                    preserveAspectRatio: "xMidYMid slice",
+                  },
+                }}
+                height="100%"
+                width="100%"
+              />
+            </div>
+            <Link
+              href="/login"
+              className="btn btn-lg btn-primary rounded-2xl mt-10"
+            >
+              Get Started
+            </Link>
+          </>
+        )}
+        {/* Start of Exercise Modal */}
         <div className={`modal ${showModal ? "modal-open" : ""}`}>
           <div className="modal-box">
             <button
@@ -143,6 +182,41 @@ export default function Home() {
             </button>
           </div>
         </div>
+        {/* End of Exercise Modal */}
+        {/* Start of Signout Modal */}
+        <dialog id="signoutModal" className="modal">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              signout();
+            }}
+            className="modal-box"
+          >
+            <h3 className="font-bold text-lg">You are about to sign out!</h3>
+            <p className="py-4">
+              Are you sure you want to leave{" "}
+              <span className={`${poetsen.className} text-primary font-bold`}>
+                HotDaddy?
+              </span>
+            </p>
+            <div className="w-full flex" role="group">
+              <button
+                type="button"
+                className="btn basis-1/2 bg-error"
+                onClick={() => document.getElementById("signoutModal").close()}
+              >
+                No
+              </button>
+              <button className="btn basis-1/2 bg-success" type="submit">
+                Yes
+              </button>
+            </div>
+          </form>
+          <form method="dialog" className="modal-backdrop">
+            <button>close</button>
+          </form>
+        </dialog>
+        {/* End of Signout Modal */}
       </div>
     </main>
   );
