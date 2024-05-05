@@ -12,6 +12,7 @@ import { poetsen } from "./fonts";
 import FAB from "@/components/FAB";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons/faArrowRightFromBracket";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Home() {
   const { currentUser } = useAuth();
@@ -101,6 +102,7 @@ export default function Home() {
         <FAB className={"glass mt-2 mr-2"} position={"topRight"}>
           <FontAwesomeIcon icon={faArrowRightFromBracket} />
         </FAB>
+        <ThemeToggle />
         <h1 className="text-primary text-5xl text-start self-center m-4">
           Get started working out!
         </h1>
