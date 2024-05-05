@@ -22,7 +22,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="btm-nav">
+    <nav className="btm-nav bg-base-100">
       <ul className="menu menu-horizontal">
         <li>
           <Link

@@ -18,4 +18,17 @@ module.exports = {
     },
   },
   plugins: [daisyui],
+  daisyui: {
+    themes: [
+      {
+        light: {
+          ...require("daisyui/src/theming/themes")["light"],
+          "base-100": "#f8f9fa",
+        },
+        dark: {
+          ...require("daisyui/src/theming/themes")["dark"],
+        },
+      },
+    ],
+  },
 };
