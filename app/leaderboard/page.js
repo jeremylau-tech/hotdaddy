@@ -29,52 +29,55 @@
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentRoomIndex, setCurrentRoomIndex] = useState(0);
     const [isRoomView, setIsRoomView] = useState(false); // false for universal, true for room-based
-
-    const roomIds = ['123456', '1234567']; // Example room IDs
+    const [roomIds, setRoomIds] = useState([]); // State for storing user's room IDs
 
     const firestore = getFirestore();
 
     const fetchUserExercises = async () => {
+      if (!currentUser) return;
       try {
-        const exerciseCollection = collection(firestore, "exercise");
-        const exerciseQuery = query(exerciseCollection);
-        const exerciseSnapshot = await getDocs(exerciseQuery);
-        
-
-        // Count exercises for each user
-        const exerciseCounts = {};
-        exerciseSnapshot.forEach((doc) => {
-          const data = doc.data();
-          const userId = data.userId;
-
-          if (userId in exerciseCounts) {
-            exerciseCounts[userId] += 1;
-          } else {
-            exerciseCounts[userId] = 1;
-          }
-        });
-
-        // Fetch user names from "users" collection
-        const userDetailsPromises = Object.keys(exerciseCounts).map(async (userId) => {
-          const userDocRef = doc(firestore, "users", userId);
-          const userDoc = await getDoc(userDocRef);
-          const userName = userDoc.exists() ? userDoc.data().name : "Unknown";
-          return {
+        const userDocRef = doc(firestore, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+  
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setRoomIds(userData.room || []); // Update roomIds from user data
+          setCurrentRoomIndex(0); // Reset currentRoomIndex
+          setRoomId(userData.room && userData.room.length > 0 ? userData.room[0] : ""); // Set initial room ID if available
+  
+          // Fetch exercises as per rooms or globally
+          const exerciseCollection = collection(firestore, "exercise");
+          const exerciseQuery = query(exerciseCollection);
+          const exerciseSnapshot = await getDocs(exerciseQuery);
+  
+          const exerciseCounts = {};
+          exerciseSnapshot.forEach((doc) => {
+            const data = doc.data();
+            const userId = data.userId;
+            if (userId in exerciseCounts) {
+              exerciseCounts[userId] += 1;
+            } else {
+              exerciseCounts[userId] = 1;
+            }
+          });
+  
+          const userDetailsPromises = Object.keys(exerciseCounts).map(async (userId) => {
+            const userDocRef = doc(firestore, "users", userId);
+            const userDoc = await getDoc(userDocRef);
+            const userName = userDoc.exists() ? userDoc.data().name : "Unknown";
+            return {
               userId,
               userName,
               count: exerciseCounts[userId],
-          };
-      });
-
-         // Resolve all promises
-         const userDetails = await Promise.all(userDetailsPromises);
-         userDetails.sort((a, b) => a.count - b.count);
- 
-
-        // Update state with sorted data
-        setUserExercises(userDetails);
+            };
+          });
+  
+          const userDetails = await Promise.all(userDetailsPromises);
+          userDetails.sort((a, b) => b.count - a.count);
+          setUserExercises(userDetails);
+        }
       } catch (error) {
-        console.error("Error fetching exercises:", error);
+        console.error("Error fetching user data:", error);
       }
     };
 
@@ -110,7 +113,7 @@
         setIsRoomView(true);
       }
     };
-    
+
   const filterByRoom = async (roomId) => {
     try {
         const roomDocRef = doc(firestore, "room", roomId);
@@ -219,15 +222,7 @@
       <div>
 
 <div>
-<div className="flex items-center justify-center">
-    <button onClick={handlePreviousRoom} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">
-      &lt;
-    </button>
-    <span>{roomId}</span>
-    <button onClick={handleNextRoom} className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
-      &gt;
-    </button>
-  </div>
+
 
     {/* Universal Table View */}
     {!isRoomView && (
@@ -239,17 +234,27 @@
         Daddies 👑
         </text>
         </div>
+
+        <div className="flex items-center justify-center">
+    <button onClick={handlePreviousRoom} className="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold mx-10 py-2 px-10 rounded-l">
+      &lt;
+    </button>
+    <span className="font-bold m-5"> {roomId} </span>
+    <button onClick={handleNextRoom} className="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold py-2 px-10  mx-10 rounded-r">
+      &gt;
+    </button>
+  </div>
         {userExercises.length > 0 ? (
           <table className="table table-zebra table-auto text-center">
             <thead>
             <tr>
-              <th className="px-6 py-3 text-lg font-medium text-blue-900 uppercase tracking-wider w-1/12">
+              <th className="px-6 py-3 text-lg font-bold text-blue-900 uppercase tracking-wider w-1/12">
                   Rank
               </th>
-              <th className="px-1 py-3 text-lg font-medium text-blue-900 uppercase tracking-wider w-4/12">
+              <th className="px-1 py-3 text-lg font-bold text-blue-900 uppercase tracking-wider w-4/12">
                 Hotties
               </th>
-              <th className="px-1 py-3 text-lg font-medium text-blue-900 uppercase tracking-wider w-7/12">
+              <th className="px-1 py-3 text-lg font-bold text-blue-900 uppercase tracking-wider w-7/12">
                 Push-ups
               </th>
             </tr>
@@ -274,7 +279,8 @@
   </tbody>
           </table>
         ) : (
-          <span className="loading loading-dots loading-lg items-center justify-center"><p>No exercise data available.</p></span>
+          <span className="loading loading-dots loading-lg m-20 text-yellow items-center justify-center">
+          </span>
           
         )}
         </div>
@@ -290,19 +296,31 @@
                 Friends 👑
             </text>
         </div>
+
+        <div className="flex items-center justify-center">
+    <button onClick={handlePreviousRoom} className="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold mx-10 py-2 px-10 rounded-l">
+      &lt;
+    </button>
+    <span className="font-bold m-5"> {roomId} </span>
+    <button onClick={handleNextRoom} className="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-bold py-2 px-10  mx-10 rounded-r">
+      &gt;
+    </button>
+  </div>
         {roomExercises.length > 0 ? (
-            <table className="table table-zebra table-auto text-center">
+            <table className="table table-zebra table-auto text-center ">
                 <thead>
                     <tr>
-                        <th className="px-6 py-3 text-lg font-medium text-blue-900 uppercase tracking-wider w-1/12">Rank</th>
-                        <th className="px-1 py-3 text-lg font-medium text-blue-900 uppercase tracking-wider w-4/12">Hotties</th>
-                        <th className="px-1 py-3 text-lg font-medium text-blue-900 uppercase tracking-wider w-7/12">Total Exercises</th>
+                        <th className="px-6 py-3 text-lg  text-blue-900 font-bold uppercase tracking-wider w-1/12">Rank</th>
+                        <th className="px-1 py-3 text-lg font-bold text-blue-900  uppercase tracking-wider w-4/12">Hotties</th>
+                        <th className="px-1 py-3 text-lg font-bold text-blue-900 uppercase tracking-wider w-7/12">Push-ups</th>
                     </tr>
-                </thead>
+                </thead>  
                 <tbody>
                 {roomExercises.map(({ userName, count }, index) => (
-                    <tr key={userName} className={index % 2 === 0 ? "bg-blue-100" : "bg-white"}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">{index + 1}</td>
+                    <tr key={userName}
+                    className={index === 0 ? "bg-yellow-400" : index % 2 === 0 ? "bg-blue-100" : "bg-white"}
+                    >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">{index === 0 ? "🥇" : index + 1}</td>
                         <td className="px-1 py-1 whitespace-nowrap text-sm font-medium text-blue-900">{userName}</td>
                         <td className="px-1 py-1 whitespace-nowrap text-sm text-blue-900">{count}</td>
                     </tr>
@@ -310,6 +328,7 @@
                 </tbody>
             </table>
         ) : (
+          
             <span className="loading"><p>No exercise data available for room {roomId}.</p></span>
         )}
     </div>
@@ -319,9 +338,9 @@
 <div className="flex items-center justify-center">
         <button 
           onClick={() => setIsModalOpen(true)} 
-          className="bg-blue-500 text-white font-bold py-2 px-4 m-10 justified rounded-full shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-opacity-50 transition duration-300 ease-in-out"
+          className="bg-red-500 text-white animate-pulse font-bold py-2 px-4 m-10 justified rounded-full shadow-lg hover:bg-red  -600 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-opacity-50 transition duration-300 ease-in-out"
       >
-          Join Your Peers
+          Challenge Now
       </button>
 
 
