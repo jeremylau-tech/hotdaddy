@@ -2,8 +2,15 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useRouter, useSearchParams } from "next/navigation";
-import { updateDoc, doc, getFirestore, collection, setDoc, getDoc} from "firebase/firestore";
-import { ImageModel } from 'react-teachable-machine';
+import {
+  updateDoc,
+  doc,
+  getFirestore,
+  collection,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
+import { ImageModel } from "react-teachable-machine";
 import { DB } from "@/firebase";
 
 export default function Workout() {
@@ -23,15 +30,14 @@ export default function Workout() {
 
   var down = false;
 
-  
   useEffect(() => {
     // Automatically start the video with specified resolution and mirrored
     navigator.mediaDevices
       .getUserMedia({
         video: {
           width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
+          height: { ideal: 720 },
+        },
       })
       .then((stream) => {
         if (videoRef.current) {
@@ -57,16 +63,16 @@ export default function Workout() {
 
   // Callback function to handle prediction
   const handlePredict = (prediction) => {
-    console.log(prediction)
+    console.log(prediction);
     if (prediction[1].probability > 0.6) {
       down = true;
     } else {
-      if (down){
+      if (down) {
         handleIncrementReps();
         down = false;
       }
     }
-    
+
     // setIsDay(prediction[0].probability > 0.5);
     // setIsNear(prediction[0].probability > 0.5);
   };
@@ -79,13 +85,13 @@ export default function Workout() {
         // Reference to the user's document in Firestore
         const userDocRef = doc(collection(DB, "users"), currentUser.uid);
         const docSnap = await getDoc(userDocRef);
-  
+
         if (docSnap.exists()) {
           // Get current number of goals
           const currentGoals = docSnap.data().numGoals || 0; // Default to 0 if undefined
           // Increment the number of goals
           const newGoals = currentGoals + 1;
-  
+
           // Update the document
           await updateDoc(userDocRef, { numGoals: newGoals });
           console.log("Number of goals updated to:", newGoals);
@@ -95,7 +101,7 @@ export default function Workout() {
       } catch (error) {
         console.error("Error updating document: ", error);
       }
-      
+
       // TODO: ADD EXERCISE ENTRY INTO TABLE
     }
   };
@@ -107,28 +113,40 @@ export default function Workout() {
           ref={videoRef}
           autoPlay
           playsInline
-          className="absolute top-0 left-0 w-full h-full object-cover" // Make video cover full screen
-          style={{ transform: 'scaleX(-1)' }} // Mirror the video output
+          className="absolute top-0 left-0 w-full h-full object-cover z-20" // Make video cover full screen
+          style={{ transform: "scaleX(-1)" }} // Mirror the video output
         />
         {showModal && (
-          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="z-30 absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-8 rounded-lg">
               <h2 className="text-xl font-bold">Workout Summary</h2>
               <p>Total Reps Completed: {currentReps}</p>
               <p>Goal Reps: {reps}</p>
-              <button className="btn btn-primary mt-4" onClick={() => closeModal(false)}>Close</button>
+              <button
+                className="btn btn-primary mt-4"
+                onClick={() => closeModal(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
         {/* Reps display at the top */}
-        <div className="absolute top-0 left-0 w-full p-4 flex justify-center">
-          <h3 className="text-lg font-semibold text-white">Current Reps: {currentReps} out of {reps}</h3>
+        <div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
+          <h3 className="text-lg font-semibold text-white">
+            Current Reps: {currentReps} out of {reps}
+          </h3>
         </div>
 
         {/* Buttons centered at the bottom */}
-        <div className="absolute bottom-0 left-0 w-full p-4 flex justify-center space-x-4">
-          <button className="btn btn-primary" onClick={handleIncrementReps}>Did a Pushup</button>
-          <button className="btn btn-primary" onClick={finishWorkout}> Finish Workout</button>
+        <div className="absolute bottom-0 left-0 w-full p-4 flex justify-center space-x-4 z-30">
+          <button className="btn btn-primary" onClick={handleIncrementReps}>
+            Did a Pushup
+          </button>
+          <button className="btn btn-primary" onClick={finishWorkout}>
+            {" "}
+            Finish Workout
+          </button>
         </div>
         <ImageModel
           preview={false}
