@@ -61,8 +61,8 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const user = localStorage.getItem("user");
-    if (!user) {
-      return router.push("/login");
+    if (!user && (path !== '/login' && path !== '/signup')) {
+      return router.push("/");
     }
 
     const getAuthenticatedUser = async () => {

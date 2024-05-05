@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { poetsen } from "@/fonts";
 
 const AuthComponent = () => {
   const router = useRouter();
@@ -10,15 +12,6 @@ const AuthComponent = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
-
-  const handleSignUp = async () => {
-    try {
-      await signup(email, password, name);
-      setError(null); // Clear any previous error
-    } catch (error) {
-      setError(error.message);
-    }
-  };
 
   const handleLogin = async () => {
     try {
@@ -36,33 +29,41 @@ const AuthComponent = () => {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="form-control px-12 gap-y-2">
-        <h2>Authentication</h2>
-        <input
-          className="input input-bordered"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-        />
-        <input
-          className="input input-bordered"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
-        <button className="btn" onClick={handleSignUp}>
-          Sign Up
-        </button>
-        <button className="btn" type="submit">
-          Login
-        </button>
+    <main className="w-screen h-screen flex justify-center items-center">
+      <form onSubmit={handleSubmit} className="form-control gap-y-2 mb-24">
+        <h1 className="text-primary text-center text-4xl font-extralight">
+          Sign in to <span className={`${poetsen.className}`}>HotDaddy</span>
+        </h1>
+        <p className="text-sm text-center">
+          Don't have an account yet?{" "}
+          <Link className="link" href="/signup">
+            {" "}
+            Sign-up here
+          </Link>{" "}
+        </p>
+        <div style={{ marginBottom: "15px", marginTop: "8px" }}>
+          <input
+            className="input input-bordered w-full"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+        </div>
+        <div style={{ marginBottom: "15px" }}>
+          <input
+            className="input input-bordered w-full"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+        </div>
+
+        <button className="btn btn-primary">Login</button>
       </form>
-      {currentUser && <p>Logged in as: {currentUser.email}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
-    </>
+    </main>
   );
 };
 

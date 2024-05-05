@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse } from "@fortawesome/free-solid-svg-icons/faHouse";
+import { faPowerOff } from "@fortawesome/free-solid-svg-icons/faPowerOff";
 import { faRankingStar } from "@fortawesome/free-solid-svg-icons/faRankingStar";
 import { faSeedling } from "@fortawesome/free-solid-svg-icons/faSeedling";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,7 +22,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="btm-nav">
+    <nav className="btm-nav bg-base-100">
       <ul className="menu menu-horizontal">
         <li>
           <Link
@@ -52,7 +53,10 @@ export default function Navbar() {
           </Link>
         </li>
         <li>
-          <button onClick={() => signout()}>Logout</button>
+          <button onClick={() => signout()}>
+            <FontAwesomeIcon icon={faPowerOff} />
+            Logout
+          </button>
         </li>
       </ul>
     </nav>

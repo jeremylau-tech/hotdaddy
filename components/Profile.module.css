@@ -1,0 +1,13 @@
+.profileContainer {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 2%;
+    padding-top: 1%;
+  }
+  
+.rightAlignedButton {
+margin-left: auto; 
+}
+.icon {
+    font-size: 30px; 
+  }
