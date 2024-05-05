@@ -1,7 +1,6 @@
 "use client";
 import { useAuth } from "@/auth/AuthProvider";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Lottie from "react-lottie";
 import ani0 from "./sap0.json";
@@ -16,6 +15,7 @@ export default function Home() {
   const { currentUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [reps, setReps] = useState(0);
+  const [exercise, setExercise] = useState("Push Ups");
   const [selectedAnimation, setSelectedAnimation] = useState(ani0);
   const router = useRouter();
   const DB = getFirestore(); // Initialize Firestore
@@ -69,35 +69,17 @@ export default function Home() {
   };
 
   const handleConfirm = async () => {
-    setShowModal(false);
-
-    try {
-      // Update the user's document in Firestore
-      const userDocRef = doc(collection(DB, "users"), currentUser.uid);
-      await setDoc(userDocRef, { default_reps: reps }, { merge: true });
-    } catch (error) {
-      console.error("Error updating document: ", error);
+    if (reps >= 1) {
+      setShowModal(false);
+      try {
+        const userDocRef = doc(collection(DB, "users"), currentUser.uid);
+        await setDoc(userDocRef, { default_reps: reps, exercise }, { merge: true });
+        console.log("Default reps set to:", reps, "Exercise set to:", exercise);
+        router.push(`/workout?reps=${reps}&exercise=${exercise}`);
+      } catch (error) {
+        console.error("Error updating document: ", error);
+      }
     }
-
-    console.log("Default reps set to:", reps);
-
-    // Navigate to the workout page with a query parameter
-    router.push(`/workout?reps=${reps}`);
-  };
-
-  const treeGrowth = async () => {
-    try {
-      // Update the user's document in Firestore
-      const userDocRef = doc(collection(DB, "users"), currentUser.uid);
-      console.log(userDocRef);
-    } catch (error) {
-      console.error("Error updating document: ", error);
-    }
-
-    console.log("Default reps set to:", reps);
-
-    // Navigate to the workout page with a query parameter
-    router.push(`/workout?reps=${reps}`);
   };
 
   return (
@@ -117,11 +99,22 @@ export default function Home() {
           >
             &times;
           </button>
-          <p className="text-lg font-semibold mb-4">Enter your default number of reps:</p>
+          <p className="text-lg font-semibold mb-4">Set your exercise and rep goal:</p>
+
+          <select
+            className="select select-bordered w-full mb-4"
+            value={exercise}
+            onChange={(e) => setExercise(e.target.value)}
+          >
+            <option value="Push Ups">Push Ups</option>
+            {/* Add more options here as needed */}
+          </select>
+
           <input
             type="number"
             value={reps}
             onChange={(e) => setReps(parseInt(e.target.value))}
+            min="1"
             className="input input-bordered w-full mb-4"
           />
           <button className="btn btn-primary w-full" onClick={handleConfirm}>
@@ -130,6 +123,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-
   );
 }
