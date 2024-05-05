@@ -97,7 +97,7 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen">
+    <main className="h-content">
       <div className="flex flex-col items-center justify-evenly h-content overflow-hidden">
         {currentUser ? (
           <>
@@ -114,7 +114,7 @@ export default function Home() {
               <FontAwesomeIcon icon={faArrowRightFromBracket} />
             </FAB>
             <ThemeToggle />
-            <div className="h-160 w-96">
+            <div className="h-[200px] w-[200px]">
               <Lottie options={defaultOptions} height="100%" width="100%" />
             </div>
             <button className="btn btn-primary" onClick={handleStartWorkout}>
