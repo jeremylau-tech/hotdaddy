@@ -12,6 +12,8 @@ import {
 } from "firebase/firestore";
 import { ImageModel } from "react-teachable-machine";
 import { DB } from "@/firebase";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDumbbell, faWeight } from "@fortawesome/free-solid-svg-icons";
 
 export default function Workout() {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
@@ -71,28 +73,25 @@ export default function Workout() {
 
   // Callback function to handle prediction
   const handlePredict = (prediction) => {
-    const isDownProb = (prediction[1].probability > 0.6);
-    const isUpProb = (prediction[0].probability > 0.6);
-    const isStopProb = (prediction[2].probability > 0.6);
-    
+    const isDownProb = prediction[1].probability > 0.6;
+    const isUpProb = prediction[0].probability > 0.6;
+    const isStopProb = prediction[2].probability > 0.6;
 
     if (isDownProb > 0.6 && !isDown) {
-      console.log("DOWN")
+      console.log("DOWN");
       isDown = true;
       console.log("Is Down State", isDown);
-
     } else if (isUpProb > 0.6 && isDown) {
-      console.log("Counted Rep")
+      console.log("Counted Rep");
       currentRepsRef.current += 1;
-      if (currentRepsRef.current >= reps){
+      if (currentRepsRef.current >= reps) {
         greenRef.current = true;
         notGreenRef.current = false;
       }
       updateRepsDisplay();
       isDown = false;
-
     } else if (isStopProb > 0.6) {
-      console.log("STOP")
+      console.log("STOP");
     }
   };
 
@@ -100,6 +99,7 @@ export default function Workout() {
     if (!workoutFinished) {
       setWorkoutFinished(true);
       setShowModal(true);
+      document.getElementById("summaryModal").showModal();
       if (currentRepsRef.current.value >= reps) {
         try {
           const userDocRef = doc(collection(DB, "users"), currentUser.uid);
@@ -129,7 +129,7 @@ export default function Workout() {
           className="absolute top-0 left-0 w-full h-full object-cover z-20" // Make video cover full screen
           style={{ transform: "scaleX(-1)" }} // Mirror the video output
         />
-        {showModal && (
+        {/* {showModal && (
           <div className="z-30 absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-8 rounded-lg">
               <h2 className="text-xl font-bold">Workout Summary</h2>
@@ -143,26 +143,61 @@ export default function Workout() {
               </button>
             </div>
           </div>
-        )}
-        {/* Reps display at the top */}
-        (<div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
-          <div className="bg-white bg-opacity-50 rounded-full px-8 py-2">
+        )} */}
+        <dialog id="summaryModal" className="modal">
+          <div className="modal-box flex flex-col gap-y-4 bg-base-300">
+            <div className="flex flex-col" role="group">
+              <h1 className="font-bold text-lg">Workout Summary</h1>
+              <subtitle>Your progress this session</subtitle>
+            </div>
+            <div className="stats shadow bg-base-100" role="group">
+              <div className="stat">
+                <div className="stat-figure text-primary">
+                  <FontAwesomeIcon
+                    className="inline-block w-8 h-8 stroke-current"
+                    icon={faDumbbell}
+                    width={"100%"}
+                    height={"100%"}
+                  />
+                </div>
+                <div className="stat-title">Reps Completed</div>
+                <div className="stat-value text-primary">
+                  {currentRepsRef.current}/{reps}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                closeModal(false);
+                document.getElementById("summaryModal").close();
+              }}
+              className="flex btn btn-primary"
+            >
+              Complete
+            </button>
+          </div>
+        </dialog>
+        {/* Reps display at the top */}(
+        <div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
+          <div className="bg-white bg-opacity-50 rounded-full px-8 py-2 border border-white ring-2 ring-white">
             <h3 className="text-lg font-semibold text-black">
-            <div ref={repsDisplayRef}>Current Reps: 0 / ${reps}</div>
+              <div ref={repsDisplayRef}>Current Reps: 0 / ${reps}</div>
             </h3>
           </div>
-        </div>)
-
-
-        
-
-        {/* Buttons centered at the bottom */}
-        <div className="absolute bottom-0 left-0 w-full p-4 flex justify-center space-x-4 z-30">
-          <button className="btn btn-primary" onClick={finishWorkout} disabled={workoutFinished}>
-            {" "}
-            Finish Workout
-          </button>
         </div>
+        ){/* Buttons centered at the bottom */}
+        {!showModal && (
+          <div className="absolute bottom-20 left-0 w-full p-4 flex justify-center space-x-4 z-30">
+            <button
+              className="btn btn-primary px-8 border border-primary border-opacity-50 ring-2 ring-black"
+              onClick={finishWorkout}
+              disabled={workoutFinished}
+            >
+              {" "}
+              Finish Workout
+            </button>
+          </div>
+        )}
         <ImageModel
           preview={false}
           size={200}

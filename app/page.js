@@ -108,7 +108,7 @@ export default function Home() {
               onClick={() =>
                 document.getElementById("signoutModal").showModal()
               }
-              className={"glass mt-2 mr-2"}
+              className={"btn-ghost mt-2 mr-2"}
               position={"topRight"}
             >
               <FontAwesomeIcon icon={faArrowRightFromBracket} />
