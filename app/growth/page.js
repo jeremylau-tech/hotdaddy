@@ -35,7 +35,9 @@ export default function Growth() {
             if (docSnap.exists()) {
               const numGoals = docSnap.data().numGoals;
               console.log("Number of Goals:", numGoals);
+              setTotalPushups(numGoals);
               setTotalGoals(numGoals);
+
             } else {
               console.log("No such document!");
             }
@@ -48,7 +50,6 @@ export default function Growth() {
           const querySnapshot = await getDocs(q);
           console.log("QuerySnapshot size:", querySnapshot.size); 
 
-          setTotalPushups(querySnapshot.size);
         } catch (error) {
           console.error('Failed to fetch exercises:', error);
         }
@@ -64,7 +65,7 @@ export default function Growth() {
 
   useEffect(() => {
     if (totalGoals > 0) {
-      const percentage = (totalPushups / totalGoals) * 100;
+      const percentage = (totalPushups / 30) * 100;
       const formattedPercentage = parseFloat(percentage.toFixed(2));
       setPercentageAchieved(formattedPercentage);
     }
@@ -83,24 +84,24 @@ export default function Growth() {
         </subtitle>
         <ul className="stats stats-vertical md:stats-horizontal w-full md:max-w-[60%] py-4 shadow-md overflow-hidden">
           <li className="stat">
-            <div className="stat-title">Total Daily Pushups</div>
+            <div className="stat-title">Goals Met To Date</div>
             <div className="flex flex-row justify-between stat-value text-primary">
               {totalPushups}
               <div className="stat-figure text-primary">
                 <FontAwesomeIcon icon={faDumbbell} className="w-8 h-8" />
               </div>
             </div>
-            <div className="stat-desc">has been accummulated.</div>
+            <div className="stat-desc">have been achieved.</div>
           </li>
           <li className="stat">
-            <div className="stat-title">Daily Goal</div>
+            <div className="stat-title">You are currently</div>
             <div className="flex flex-row justify-between stat-value text-primary">
              {percentageAchieved}%
               <div className="stat-figure text-primary">
                 <FontAwesomeIcon icon={faArrowUpRightDots} className="w-8 h-8" />
               </div>
             </div>
-            <div className="stat-desc">out of the daily goal.</div>
+            <div className="stat-desc">of a full month!</div>
           </li>
         </ul>
       </div>
@@ -111,7 +112,7 @@ export default function Growth() {
         </subtitle>
         <ul className="carousel mt-4 font-semibold">
         <Achievement>
-<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(100) }} />
+<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(3) }} />
 <div className="card-body">
   <p>
     1 Exercise <br /> Streak
@@ -119,34 +120,34 @@ export default function Growth() {
 </div>
 </Achievement>
 <Achievement>
-<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(500) }} />
+<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(6) }} />
+<div className="card-body">
+  <p>
+    2 Exercise <br /> Streak
+  </p>
+</div>
+</Achievement>
+<Achievement>
+<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(9) }} />
+<div className="card-body">
+  <p>
+    3 Exercise <br /> Streak
+  </p>
+</div>
+</Achievement>
+<Achievement>
+<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(12) }} />
+<div className="card-body">
+  <p>
+    4 Exercise <br /> Streak
+  </p>
+</div>
+</Achievement>
+<Achievement>
+<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(15) }} />
 <div className="card-body">
   <p>
     5 Exercise <br /> Streak
-  </p>
-</div>
-</Achievement>
-<Achievement>
-<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(1000) }} />
-<div className="card-body">
-  <p>
-    10 Exercise <br /> Streak
-  </p>
-</div>
-</Achievement>
-<Achievement>
-<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(1500) }} />
-<div className="card-body">
-  <p>
-    15 Exercise <br /> Streak
-  </p>
-</div>
-</Achievement>
-<Achievement>
-<FontAwesomeIcon icon={faCertificate} style={{ color: getAchievementColor(2000) }} />
-<div className="card-body">
-  <p>
-    20 Exercise <br /> Streak
   </p>
 </div>
 </Achievement>
