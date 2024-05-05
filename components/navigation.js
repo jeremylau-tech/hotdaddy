@@ -29,10 +29,16 @@ export default function Navbar() {
             className={isNavItemActive("/", pathname) ? "active" : ""}
             href="/"
           >
-            <FontAwesomeIcon icon={faHouse} />
+            <FontAwesomeIcon
+              icon={faHouse}
+              className={
+                isNavItemActive("/", pathname) ? "text-primary" : "neutral"
+              }
+            />
             Home
           </Link>
         </li>
+
         <li>
           <Link
             className={
@@ -40,24 +46,40 @@ export default function Navbar() {
             }
             href="/leaderboard"
           >
-            <FontAwesomeIcon icon={faRankingStar} /> Leaderboard
+            <FontAwesomeIcon
+              icon={faRankingStar}
+              className={
+                isNavItemActive("/leaderboard", pathname)
+                  ? "text-primary"
+                  : "neutral"
+              }
+            />
+            Leaderboard
           </Link>
         </li>
+
         <li>
           <Link
             className={isNavItemActive("/growth", pathname) ? "active" : ""}
             href="/growth"
           >
-            <FontAwesomeIcon icon={faSeedling} />
+            <FontAwesomeIcon
+              icon={faSeedling}
+              className={
+                isNavItemActive("/growth", pathname)
+                  ? "text-primary"
+                  : "neutral"
+              }
+            />
             Growth
           </Link>
         </li>
-        <li>
+        {/* <li>
           <button onClick={() => signout()}>
             <FontAwesomeIcon icon={faPowerOff} />
             Logout
           </button>
-        </li>
+        </li> */}
       </ul>
     </nav>
   );

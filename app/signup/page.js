@@ -3,8 +3,13 @@
 import React, { useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { poetsen } from "@/fonts";
+import FAB from "@/components/FAB";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons/faChevronLeft";
+import { useRouter } from "next/navigation";
 
 const AuthComponent = ({ children }) => {
+  const router = useRouter();
   const { currentUser, signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +32,13 @@ const AuthComponent = ({ children }) => {
 
   return (
     <main className="w-screen h-screen flex justify-center items-center px-6">
+      <FAB
+        onClick={() => router.push("/login")}
+        position="topLeft"
+        className={"glass"}
+      >
+        <FontAwesomeIcon icon={faChevronLeft} /> Back
+      </FAB>
       <form onSubmit={handleSubmit} className="form-control gap-y-2 mb-24">
         <h1 className="text-primary text-center text-4xl font-extralight">
           Your <span className={`${poetsen.className}`}>HotDaddy</span>{" "}

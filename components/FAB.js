@@ -19,7 +19,7 @@ export default function FAB({ className, children, position, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`btn btn-accent rounded-3xl ${
+      className={`btn rounded-3xl ${
         className ? className : ""
       } absolute ${getPosition()}`}
     >
