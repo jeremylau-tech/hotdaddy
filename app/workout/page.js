@@ -60,10 +60,6 @@ export default function Workout() {
     return null;
   }
 
-  const handleIncrementReps = () => {
-    setCurrentReps(currentReps + 1);
-  };
-
   const closeModal = () => {
     router.back();
   };
@@ -84,10 +80,8 @@ export default function Workout() {
 
     } else if (isUpProb > 0.6 && isDown) {
       console.log("Counted Rep")
-      // setCurrentReps(reps => reps + 1);
       currentRepsRef.current += 1;
       updateRepsDisplay();
-      // console.log("Current Reps: ", currentReps);
       isDown = false;
 
     } else if (isStopProb > 0.6) {
@@ -152,16 +146,15 @@ export default function Workout() {
         )}
         {/* Reps display at the top */}
         <div className="absolute top-0 left-0 w-full p-4 flex justify-center z-30">
-          <h3 className="text-lg font-semibold text-white">
-          <div ref={repsDisplayRef}>Current Reps: 0 / ${reps}</div>
-          </h3>
+          <div className="bg-white bg-opacity-50 rounded-full px-8 py-2">
+            <h3 className="text-lg font-semibold text-black">
+            <div ref={repsDisplayRef}>Current Reps: 0 / ${reps}</div>
+            </h3>
+          </div>
         </div>
 
         {/* Buttons centered at the bottom */}
         <div className="absolute bottom-0 left-0 w-full p-4 flex justify-center space-x-4 z-30">
-          <button className="btn btn-primary" onClick={handleIncrementReps}>
-            Did a Pushup
-          </button>
           <button className="btn btn-primary" onClick={finishWorkout}>
             {" "}
             Finish Workout
