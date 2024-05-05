@@ -22,6 +22,10 @@ import {
 } from "firebase/firestore";
 import Link from "next/link";
 import { app } from "@/firebase"; // Your Firebase app setup
+import { poetsen } from "./fonts";
+import FAB from "@/components/FAB";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons/faArrowRightFromBracket";
 
 export default function Home() {
   const { currentUser, signout } = useAuth();
@@ -61,6 +65,7 @@ export default function Home() {
 
   const defaultOptions = {
     loop: false,
+
     autoplay: true,
     animationData: selectedAnimation,
     rendererSettings: {

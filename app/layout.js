@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme = "dark">
+    <html lang="en" data-theme="dark">
       <head>
         <link rel="icon" href="/favicon.ico?" type="image/x-icon" />
       </head>
@@ -25,14 +25,10 @@ export default function RootLayout({ children }) {
         className={`${inter.className} bg-base-100 h-screen w-screen overflow-hidden`}
       >
         <AuthProvider>
-          <header>
-            <Profile />
-          </header>
           {children}
           <Navbar />
         </AuthProvider>
       </body>
-
     </html>
   );
 }
