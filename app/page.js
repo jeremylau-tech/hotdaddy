@@ -106,6 +106,7 @@ export default function Home() {
         <FAB className={"glass mt-2 mr-2"} position={"topRight"}>
           <FontAwesomeIcon icon={faArrowRightFromBracket} />
         </FAB>
+        <ThemeToggle />
         <h1 className="text-primary text-5xl text-start self-center m-4">
           Get started working out!
         </h1>
