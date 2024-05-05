@@ -66,6 +66,7 @@ export default function Workout() {
         down = false;
       }
     }
+    
     // setIsDay(prediction[0].probability > 0.5);
     // setIsNear(prediction[0].probability > 0.5);
   };
