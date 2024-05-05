@@ -103,7 +103,7 @@ export default function Home() {
         <h1 className="text-primary text-5xl text-start self-center m-4">
           Get started working out!
         </h1>
-        <div className="h-160 w-96">
+        <div className="h-160 w-96 pointer-events-none">
           <Lottie options={defaultOptions} height="100%" width="100%" />
         </div>
         <button className="btn btn-primary" onClick={handleStartWorkout}>
