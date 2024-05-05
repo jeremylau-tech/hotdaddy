@@ -9,6 +9,9 @@ import ani2 from "./sap2.json";
 import ani3 from "./sap3.json";
 import ani4 from "./sap4.json";
 import { poetsen } from "./fonts";
+import FAB from "@/components/FAB";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons/faArrowRightFromBracket";
 
 export default function Home() {
   const { currentUser } = useAuth();
@@ -17,6 +20,7 @@ export default function Home() {
   const router = useRouter();
   const defaultOptions = {
     loop: false,
+
     autoplay: true,
     animationData: ani3,
     rendererSettings: {
@@ -92,59 +96,64 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <button
-        className={`${poetsen.className} text-xl text-primary absolute top-0 left-0 ml-4 mt-4`}
-      >
-        HotDaddy
-      </button>
-      {currentUser ? (
-        <button
-          className="btn font-bold text-xl btn-primary"
-          onClick={handleStartWorkout}
-        >
-          Start Workout
-        </button>
-      ) : (
-        <h1 className={`text-5xl font-bold text-primary ${poetsen.className}`}>
-          {" "}
-          HotDaddy
+    <main className="h-content">
+      <div className="flex flex-col items-center justify-evenly h-full">
+        <FAB className={"glass mt-2 mr-2"} position={"topRight"}>
+          <FontAwesomeIcon icon={faArrowRightFromBracket} />
+        </FAB>
+        <h1 className="text-primary text-5xl text-start self-center m-4">
+          Get started working out!
         </h1>
-      )}
 
-      <div className={`modal ${showModal ? "modal-open" : ""}`}>
-        <div className="modal-box">
-          <button
-            className="btn btn-sm btn-circle absolute right-2 top-2"
-            onClick={handleModalClose}
-          >
-            &times;
-          </button>
-          <p className="text-lg font-semibold mb-4">
-            Enter your default number of reps:
-          </p>
-          <input
-            type="number"
-            value={reps}
-            onChange={(e) => setReps(e.target.value)}
-            className="input input-bordered w-full mb-4"
-          />
-          <button className="btn btn-primary w-full" onClick={handleConfirm}>
-            Confirm
-          </button>
+        <div className={`modal ${showModal ? "modal-open" : ""}`}>
+          <div className="modal-box">
+            <button
+              className="btn btn-sm btn-circle absolute right-2 top-2"
+              onClick={handleModalClose}
+            >
+              &times;
+            </button>
+            <p className="text-lg font-semibold mb-4">
+              Enter your default number of reps:
+            </p>
+            <input
+              type="number"
+              value={reps}
+              onChange={(e) => setReps(e.target.value)}
+              className="input input-bordered w-full mb-4"
+            />
+            <button className="btn btn-primary w-full" onClick={handleConfirm}>
+              Confirm
+            </button>
+          </div>
         </div>
+        <div>
+          <Lottie options={defaultOptions} height={200} width={200} />
+        </div>
+        {currentUser ? (
+          <button
+            className="btn rounded-3xl font-bold text-lg btn-primary text-[#f8f9fa]"
+            onClick={handleStartWorkout}
+          >
+            Start Workout
+          </button>
+        ) : (
+          <h1
+            className={`text-5xl font-bold text-primary ${poetsen.className}`}
+          >
+            {" "}
+            HotDaddy
+          </h1>
+        )}
+        {!currentUser && (
+          <Link
+            href="/login"
+            className="btn btn-lg btn-primary rounded-2xl mt-10"
+          >
+            Get Started
+          </Link>
+        )}
       </div>
-      <div>
-        <Lottie options={defaultOptions} height={200} width={200} />
-      </div>
-      {!currentUser && (
-        <Link
-          href="/login"
-          className="btn btn-lg btn-primary rounded-2xl mt-10"
-        >
-          Get Started
-        </Link>
-      )}
-    </div>
+    </main>
   );
 }

@@ -22,11 +22,10 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/favicon.ico?" type="image/x-icon" />
       </head>
-      <body className={`${inter.className} h-screen w-screen overflow-hidden`}>
+      <body
+        className={`${inter.className} bg-base-100 h-screen w-screen overflow-hidden`}
+      >
         <AuthProvider>
-          {/* <header>
-            <Profile />
-          </header> */}
           {children}
           <Navbar />
         </AuthProvider>
