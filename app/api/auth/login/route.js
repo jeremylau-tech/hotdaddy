@@ -6,14 +6,17 @@ export const dynamic = "force-dynamic"; // defaults to auto
 export async function POST(request) {
   const data = await request.json();
   const { email, password } = data;
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      FIREBASE_AUTH,
+      email,
+      password
+    );
 
-  const userCredential = await signInWithEmailAndPassword(
-    FIREBASE_AUTH,
-    email,
-    password
-  );
-
-  return new NextResponse(JSON.stringify({ user: userCredential.user }), {
-    status: 200,
-  });
+    return new NextResponse(JSON.stringify({ user: userCredential.user }), {
+      status: 200,
+    });
+  } catch (err) {
+    return new NextResponse(JSON.stringify({ error: err }), { status: 401 });
+  }
 }

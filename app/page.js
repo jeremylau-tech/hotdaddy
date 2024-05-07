@@ -45,7 +45,7 @@ export default function Home() {
       console.log("Goals Data: ", goalsData.numGoals);
 
       // Determine the animation index based on goals
-      const animationIndex = Math.min(goalsData.numGoals, 3);
+      const animationIndex = Math.min(goalsData.numGoals ?? 0, 3); // FIX: GOALS DATA CAN BE UNDEFINED
       setSelectedAnimation(animations[animationIndex]);
 
       console.log("Selected Animation Playing ", animationIndex);

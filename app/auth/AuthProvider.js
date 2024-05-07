@@ -11,7 +11,6 @@ export default function AuthProvider({ children }) {
   const router = useRouter();
 
   const signup = async (email, password, name) => {
-    console.log(email, password, name);
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       body: JSON.stringify({
@@ -20,8 +19,20 @@ export default function AuthProvider({ children }) {
         name,
       }),
     });
-
     const data = await res.json();
+    // Error Handling
+    if (data.error) {
+      switch (data.error.code) {
+        case "auth/weak-password":
+          throw new Error(
+            "Your password is not strong enough. It must be at least 6 characters long."
+          );
+        case "auth/missing-password":
+          throw new Error("Please enter a password");
+        case "auth/email-already-in-use":
+          throw new Error("That account exists already!");
+      }
+    }
     localStorage.setItem("user", JSON.stringify(data.user));
     setCurrentUser(data.user);
   };
@@ -36,6 +47,14 @@ export default function AuthProvider({ children }) {
     });
 
     const data = await res.json();
+    if (data.error) {
+      switch (data.error.code) {
+        case "auth/missing-password":
+          throw new Error("Please enter a password");
+        case "auth/invalid-credential":
+          throw new Error("Your password or email is wrong!");
+      }
+    }
     localStorage.setItem("user", JSON.stringify(data.user));
     setCurrentUser(data.user);
   };

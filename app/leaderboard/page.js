@@ -254,7 +254,7 @@ const GroupComponent = () => {
   return (
     <div className="max-w-screen-sm h-content">
       <div className="h-full">
-        <div className="flex flex-wrap break-words toast toast-start toast-top">
+        <div className="w-3/4 break-words whitespace-pre-wrap toast toast-start toast-top">
           {toast &&
             (Boolean(success) ? (
               <div className="flex break-words alert alert-success">

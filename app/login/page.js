@@ -1,9 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { poetsen } from "@/fonts";
+import FAB from "@/components/FAB";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 
 const AuthComponent = () => {
   const router = useRouter();
@@ -12,11 +15,13 @@ const AuthComponent = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
+  const [isSuccessful, setIsSuccessful] = useState(false);
 
   const handleLogin = async () => {
     try {
       await login(email, password);
       setError(null); // Clear any previous error
+      setIsSuccessful(true);
       router.push("/");
     } catch (error) {
       setError(error.message);
@@ -28,8 +33,35 @@ const AuthComponent = () => {
     handleLogin();
   };
 
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+    }
+  }, [error]);
+
   return (
     <main className="w-screen h-screen flex justify-center items-center">
+      <div className="w-3/4 break-words whitespace-pre-wrap toast toast-top toast-center">
+        {error && (
+          <div className="flex break-words alert alert-error">
+            <span>{error}</span>
+          </div>
+        )}
+        {isSuccessful && (
+          <div className="flex break-words alert alert-success">
+            <span>You've signed up successfully!</span>
+          </div>
+        )}
+      </div>
+      <FAB
+        onClick={() => router.push("/")}
+        position="topLeft"
+        className={"glass"}
+      >
+        <FontAwesomeIcon icon={faChevronLeft} /> Back
+      </FAB>
       <form onSubmit={handleSubmit} className="form-control gap-y-2 mb-24">
         <h1 className="text-primary text-center text-4xl font-extralight">
           Sign in to <span className={`${poetsen.className}`}>HotDaddy</span>
@@ -62,7 +94,6 @@ const AuthComponent = () => {
 
         <button className="btn btn-primary">Login</button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </main>
   );
 };

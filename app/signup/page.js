@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { poetsen } from "@/fonts";
 import FAB from "@/components/FAB";
@@ -15,11 +15,14 @@ const AuthComponent = ({ children }) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
+  const [isSuccessful, setIsSuccessful] = useState(false);
 
   const handleSignUp = async () => {
     try {
       await signup(email, password, name);
       setError(null); // Clear any previous error
+      setIsSuccessful(true);
+      router.push("/");
     } catch (error) {
       setError(error.message);
     }
@@ -30,8 +33,29 @@ const AuthComponent = ({ children }) => {
     handleSignUp();
   };
 
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+    }
+  }, [error]);
+
   return (
     <main className="w-screen h-screen flex justify-center items-center px-6">
+      <div className="w-3/4 break-words whitespace-pre-wrap toast toast-top toast-center">
+        {error && (
+          <div className="flex break-words alert alert-error">
+            <span>{error}</span>
+          </div>
+        )}
+        {isSuccessful && (
+          <div className="flex break-words alert alert-success">
+            <span>You've signed up successfully!</span>
+          </div>
+        )}
+      </div>
+
       <FAB
         onClick={() => router.push("/login")}
         position="topLeft"
@@ -74,7 +98,6 @@ const AuthComponent = ({ children }) => {
 
         <button className="btn btn-primary">Sign Up</button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </main>
   );
 };

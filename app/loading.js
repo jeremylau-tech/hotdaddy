@@ -5,7 +5,6 @@ import Lottie from "react-lottie";
 import loadingAnimation from "./loadingSapling.json";
 
 export default function Loading() {
-  console.log(loadingAnimation);
   return (
     <main className="h-screen w-screen flex items-center justify-center">
       <div className="h-160 w-96">
